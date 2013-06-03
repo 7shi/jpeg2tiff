@@ -46,13 +46,14 @@ Public Class Form1
         bmp2.SetResolution(600, 600)
 
         Dim dst(((bw2a * bh2) \ 8) - 1) As Byte
+        Dim thr = CInt(NumericUpDown1.Value)
         For y = off2 To bh1 - off2 - 1
             Dim p1 = bw1 * y * 4 + off2
             Dim p2 = (bw2a \ 8) * (y - off2)
             Dim b = 128
             For x = off2 To bw1 - off2 - 1
                 Dim v = (CInt(src(p1)) + CInt(src(p1 + 1)) + CInt(src(p1 + 2))) \ 3
-                If v >= 160 Then dst(p2) += b
+                If v >= thr Then dst(p2) += b
                 p1 += 4
                 b >>= 1
                 If b = 0 Then
@@ -93,5 +94,23 @@ Public Class Form1
 
     Private Sub BackgroundWorker1_RunWorkerCompleted(sender As System.Object, e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles BackgroundWorker1.RunWorkerCompleted
         ProgressBar1.Value = 0
+    End Sub
+
+    Dim ignore As Boolean
+
+    Private Sub TrackBar1_Scroll(sender As System.Object, e As System.EventArgs) Handles TrackBar1.Scroll
+        If Not ignore Then
+            ignore = True
+            NumericUpDown1.Value = TrackBar1.Value
+            ignore = False
+        End If
+    End Sub
+
+    Private Sub NumericUpDown1_ValueChanged(sender As System.Object, e As System.EventArgs) Handles NumericUpDown1.ValueChanged
+        If Not ignore Then
+            ignore = True
+            TrackBar1.Value = NumericUpDown1.Value
+            ignore = False
+        End If
     End Sub
 End Class
